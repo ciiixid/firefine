@@ -1,5 +1,6 @@
 # 🔥 Firefine 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)  [![Telegram Bot API](https://img.shields.io/badge/Telegram-2CA5E0?style=flat-square&logo=telegram&logoColor=white)](https://core.telegram.org/bots/api)
+
 Firefine is a self-hosted, anonymous Telegram-based live chat system built with Node.js, Express, and SQLite. It routes web visitor messages directly to a Telegram bot, allowing administrators to reply instantly from Telegram, with replies synced back to the web visitor in real-time.
 
 ---
