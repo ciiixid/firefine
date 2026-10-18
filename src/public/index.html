@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Chat</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent: #0071e3;
+            --user-bubble: #0071e3;
+            --user-text: #ffffff;
+            --admin-bubble: rgba(240, 240, 242, 0.85);
+            --admin-text: #1d1d1f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            /* Clean minimalist light background with very soft abstract shapes */
+            background-color: #f2f2f7;
+            background-image: 
+                radial-gradient(at 15% 15%, rgba(0, 113, 227, 0.08) 0px, transparent 50%),
+                radial-gradient(at 85% 85%, rgba(142, 142, 147, 0.08) 0px, transparent 50%);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 540px;
+            height: 100vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--glass-shadow);
+        }
+
+        @media (min-width: 768px) {
+            .chat-container {
+                height: 78vh;
+                border-radius: 24px;
+                overflow: hidden;
+            }
+        }
+
+        .chat-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            z-index: 10;
+        }
+
+        .chat-header .avatar {
+            width: 36px;
+            height: 36px;
+            background: #1d1d1f;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .chat-header-info h2 {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: #1d1d1f;
+        }
+
+        .chat-header-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chat-header-info p::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background-color: #34c759;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: rgba(250, 250, 252, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tg-msg {
+            max-width: 75%;
+            padding: 11px 15px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.45;
+            word-wrap: break-word;
+            letter-spacing: -0.01em;
+        }
+
+        .tg-msg.user {
+            background: var(--user-bubble);
+            color: var(--user-text);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+        }
+
+        .tg-msg.admin {
+            background: var(--admin-bubble);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--admin-text);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .chat-input-area {
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 11px 16px;
+            background: rgba(239, 239, 241, 0.8);
+            border: 1px solid transparent;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .chat-input-area input:focus {
+            background: #ffffff;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+        }
+
+        .chat-input-area button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s ease, background 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3);
+        }
+
+        .chat-input-area button:hover {
+            background: #0077ed;
+            transform: scale(1.05);
+        }
+
+        .chat-input-area button svg {
+            width: 15px;
+            height: 15px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="avatar">S</div>
+            <div class="chat-header-info">
+                <h2>Support Team</h2>
+                <p>Powered by Firefine</p>
+            </div>
+        </div>
+        
+        <div id="chat-messages" class="chat-messages">
+            <div class="tg-msg admin">Hello! How can we help you?</div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Message..." autofocus />
+            <button id="chat-send" title="Send">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let visitorToken = localStorage.getItem('tg_livechat_token');
+        if (!visitorToken) {
+            visitorToken = 'sess_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+            localStorage.setItem('tg_livechat_token', visitorToken);
+        }
+
+        const messagesContainer = document.getElementById('chat-messages');
+        const inputField = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('chat-send');
+
+        async function fetchMessages() {
+            try {
+                const response = await fetch(`/api/messages/${visitorToken}`);
+                const result = await response.json();
+                if (result.success && result.data) {
+                    renderMessages(result.data);
+                }
+            } catch (err) {
+                console.error('Failed to fetch messages:', err);
+            }
+        }
+
+        function renderMessages(messages) {
+            messagesContainer.innerHTML = `<div class="tg-msg admin">Hello! Welcome to our glass-styled support. How can we help you?</div>`;
+            messages.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `tg-msg ${msg.sender}`;
+                msgDiv.textContent = msg.message;
+                messagesContainer.appendChild(msgDiv);
+            });
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = inputField.value.trim();
+            if (!text) return;
+
+            inputField.value = '';
+
+            const tempDiv = document.createElement('div');
+            tempDiv.className = 'tg-msg user';
+            tempDiv.textContent = text;
+            messagesContainer.appendChild(tempDiv);
+            scrollToBottom();
+
+            try {
+                await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ visitor_token: visitorToken, message: text })
+                });
+                fetchMessages();
+            } catch (err) {
+                console.error('Failed to send message:', err);
+            }
+        }
+
+        sendBtn.onclick = sendMessage;
+        inputField.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+
+        setInterval(fetchMessages, 4000);
+        fetchMessages();
+    </script>
+</body>
+</html>
